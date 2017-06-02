@@ -86,6 +86,11 @@ abstract class OrmFunctionalTestCase extends OrmTestCase
             'Doctrine\Tests\Models\CMS\CmsArticle',
             'Doctrine\Tests\Models\CMS\CmsComment',
         ),
+        'relay' => array(
+            'Doctrine\Tests\Models\Relay\Node',
+            'Doctrine\Tests\Models\Relay\ProofCopy',
+            'Doctrine\Tests\Models\Relay\Review',
+        ),
         'forum' => array(),
         'company' => array(
             'Doctrine\Tests\Models\Company\CompanyPerson',

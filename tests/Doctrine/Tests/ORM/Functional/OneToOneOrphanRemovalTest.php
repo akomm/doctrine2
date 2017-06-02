@@ -5,7 +5,8 @@ namespace Doctrine\Tests\ORM\Functional;
 use Doctrine\Tests\Models\CMS\CmsUser,
     Doctrine\Tests\Models\CMS\CmsEmail,
     Doctrine\Tests\Models\CMS\CmsAddress,
-    Doctrine\Tests\Models\CMS\CmsPhonenumber;
+    Doctrine\Tests\Models\CMS\CmsPhonenumber,
+    Doctrine\Tests\Models\Relay\Review;
 
 /**
  * Tests a bidirectional one-to-one association mapping with orphan removal.
@@ -15,6 +16,7 @@ class OneToOneOrphanRemovalTest extends \Doctrine\Tests\OrmFunctionalTestCase
     protected function setUp()
     {
         $this->useModelSet('cms');
+        $this->useModelSet('relay');
 
         parent::setUp();
     }
@@ -55,6 +57,30 @@ class OneToOneOrphanRemovalTest extends \Doctrine\Tests\OrmFunctionalTestCase
         $result = $query->getResult();
 
         $this->assertEquals(0, count($result), 'CmsAddress should be removed by orphanRemoval');
+    }
+
+    public function testOneToOneOrphanFromInversed()
+    {
+        $review = new Review;
+        $proofCopy = $review->assignNewProofCopy();
+
+        $this->_em->persist($review);
+        $this->_em->flush();
+        $this->_em->clear();
+
+        $reviewId = $review->getId();
+
+        $review = $this->_em->getRepository(Review::class)->find($reviewId);
+        $this->assertSame($proofCopy->getId(), $review->getProofCopy()->getId(), 'ProofCopy should not be null');
+
+        $proofCopy = $review->assignNewProofCopy();
+
+        $this->_em->persist($review);
+        $this->_em->flush();
+        $this->_em->clear();
+
+        $review = $this->_em->getRepository(Review::class)->find($reviewId);
+        $this->assertSame($proofCopy->getId(), $review->getProofCopy()->getId(), 'ProofCopy should not be null');
     }
 
     public function testOrphanRemovalWhenUnlink()
